@@ -25,7 +25,12 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+
+#include <stdbool.h>
+#include <stdio.h>
+
 #include "ssd1306.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,11 +52,21 @@
 
 /* USER CODE BEGIN PV */
 
+static uint32_t adc_buf = 0;
+
+static bool adc_ready = false;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
+{
+	adc_buf = HAL_ADC_GetValue(hadc);
+	adc_ready = true;
+}
 
 /* USER CODE END PFP */
 
@@ -92,15 +107,58 @@ int main(void)
   MX_I2C1_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+
   ssd1306_Init();
+
   ssd1306_Fill(White);
+
+  ssd1306_SetCursor(5,10);
+  ssd1306_WriteString("Mode:", Font_7x10, Black);
+
+  ssd1306_SetCursor(40,10);
+  ssd1306_WriteChar('U', Font_7x10, Black);
+
+  ssd1306_Line(40, 7, 45, 7, Black); // U -
+//  ssd1306_Line(40, 6, 40, 8, Black); // U~
+//  ssd1306_Line(41, 6, 42, 6, Black);
+//  ssd1306_Line(43, 7, 44, 7, Black);
+//  ssd1306_DrawPixel(44, 6, Black);
+//  ssd1306_DrawPixel(44, 5, Black);
+
+  ssd1306_SetCursor(50,10);
+  ssd1306_WriteChar('|', Font_7x10, Black);
+
+  ssd1306_SetCursor(60,10);
+  ssd1306_WriteString("Range:", Font_7x10, Black);
+
+  ssd1306_SetCursor(100,11);
+  ssd1306_WriteString("3.3V", Font_6x8, Black);
+
+  ssd1306_DrawRectangle(5, 30, 123, 60, Black);
+
   ssd1306_UpdateScreen();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
+  float adc_val = 0;
+  char str[9] = {0};
+  HAL_ADC_Start_IT(&hadc1);
+
   while (1)
   {
+	  if (adc_ready) {
+		  adc_val = (float)((adc_buf * 3.3) / 4095);
+		  snprintf(str, sizeof(str), "%f", adc_val);
+		  ssd1306_SetCursor(10, 37);
+		  ssd1306_WriteString(str, Font_11x18, Black);
+		  ssd1306_UpdateScreen();
+		  adc_ready = false;
+		  HAL_Delay(100);
+		  HAL_ADC_Start_IT(&hadc1);
+	  }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
