@@ -54,15 +54,72 @@
 
 /* USER CODE BEGIN PV */
 
-static uint32_t adc_buf = 0;
+enum modes {
+	AC_VOLTAGE_MODE = 0,
+	DC_VOLTAGE_MODE_RANGE_1,
+	DC_VOLTAGE_MODE_RANGE_2,
+	DC_VOLTAGE_MODE_RANGE_3,
+	RESISTANCE_MODE_RANGE_1,
+	RESISTANCE_MODE_RANGE_2,
+	RESISTANCE_MODE_RANGE_3,
+	CAPACITY_MODE_RANGE_1,
+	CAPACITY_MODE_RANGE_2,
+	CAPACITY_MODE_RANGE_3,
+};
 
+static uint32_t adc_buf = 0;
+static uint8_t mode = 0;
+
+static bool mode_chosen = false;
 static bool adc_ready = false;
+
+float adc_val = 0;
+char str[9] = {0};
 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	switch (GPIO_Pin) {
+		case AC_VOLTAGE_MODE_Pin:
+			mode = AC_VOLTAGE_MODE;
+			break;
+		case DC_VOLTAGE_MODE_RANGE_1_Pin:
+			mode = DC_VOLTAGE_MODE_RANGE_1;
+			break;
+		case DC_VOLTAGE_MODE_RANGE_2_Pin:
+			mode = DC_VOLTAGE_MODE_RANGE_2;
+			break;
+		case DC_VOLTAGE_MODE_RANGE_3_Pin:
+			mode = DC_VOLTAGE_MODE_RANGE_3;
+			break;
+		case RESISTANCE_MODE_RANGE_1_Pin:
+			mode = RESISTANCE_MODE_RANGE_1;
+			break;
+		case RESISTANCE_MODE_RANGE_2_Pin:
+			mode = RESISTANCE_MODE_RANGE_2;
+			break;
+		case RESISTANCE_MODE_RANGE_3_Pin:
+			mode = RESISTANCE_MODE_RANGE_3;
+			break;
+		case CAPACITY_MODE_RANGE_1_Pin:
+			mode = CAPACITY_MODE_RANGE_1;
+			break;
+		case CAPACITY_MODE_RANGE_2_Pin:
+			mode = CAPACITY_MODE_RANGE_2;
+			break;
+		case CAPACITY_MODE_RANGE_3_Pin:
+			mode = CAPACITY_MODE_RANGE_3;
+			break;
+		default:
+			return;
+	}
+	mode_chosen = true;
+}
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
@@ -99,6 +156,219 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+static void default_display_setup(void)
+{
+	  ssd1306_Init();
+
+	  ssd1306_Fill(White);
+
+	  ssd1306_SetCursor(5,10);
+	  ssd1306_WriteString("Mode:", Font_7x10, Black);
+
+	  ssd1306_SetCursor(50,10);
+	  ssd1306_WriteChar('|', Font_7x10, Black);
+
+	  ssd1306_SetCursor(60,10);
+	  ssd1306_WriteString("Range:", Font_7x10, Black);
+
+	  ssd1306_DrawRectangle(5, 30, 123, 60, Black);
+
+	  ssd1306_UpdateScreen();
+}
+
+static void ac_voltage_measure(void)
+{
+	if (mode_chosen) {
+		  ssd1306_SetCursor(40,10);
+		  ssd1306_WriteChar('U', Font_7x10, Black);
+
+		  ssd1306_Line(40, 6, 40, 8, Black);
+		  ssd1306_Line(41, 6, 42, 6, Black);
+		  ssd1306_Line(43, 7, 44, 7, Black);
+		  ssd1306_DrawPixel(44, 6, Black);
+		  ssd1306_DrawPixel(44, 5, Black);
+
+		  ssd1306_UpdateScreen();
+
+		  mode_chosen = false;
+
+		  HAL_ADC_Start_IT(&hadc1);
+	}
+}
+
+static void dc_voltage_1_measure(void)
+{
+	if (mode_chosen) {
+		  ssd1306_SetCursor(40,10);
+		  ssd1306_WriteChar('U', Font_7x10, Black);
+
+		  ssd1306_Line(40, 7, 45, 7, Black);
+
+		  ssd1306_SetCursor(100,11);
+		  ssd1306_WriteChar('1', Font_7x10, Black);
+
+		  ssd1306_UpdateScreen();
+
+		  mode_chosen = false;
+
+		  HAL_ADC_Start_IT(&hadc1);
+	}
+
+	if (adc_ready) {
+	  adc_val = (float)((adc_buf * 3.3) / 4095);
+	  snprintf(str, sizeof(str), "%f", adc_val);
+	  ssd1306_SetCursor(10, 37);
+	  ssd1306_WriteString(str, Font_11x18, Black);
+	  ssd1306_UpdateScreen();
+	  adc_ready = false;
+	  HAL_Delay(100);
+	  HAL_ADC_Start_IT(&hadc1);
+	}
+}
+
+static void dc_voltage_2_measure(void)
+{
+	if (mode_chosen) {
+		  ssd1306_SetCursor(40,10);
+		  ssd1306_WriteChar('U', Font_7x10, Black);
+
+		  ssd1306_Line(40, 7, 45, 7, Black);
+
+		  ssd1306_SetCursor(100,11);
+		  ssd1306_WriteChar('2', Font_7x10, Black);
+
+		  ssd1306_UpdateScreen();
+
+		  mode_chosen = false;
+
+		  HAL_ADC_Start_IT(&hadc1);
+	}
+}
+
+static void dc_voltage_3_measure(void)
+{
+	if (mode_chosen) {
+		  ssd1306_SetCursor(40,10);
+		  ssd1306_WriteChar('U', Font_7x10, Black);
+
+		  ssd1306_Line(40, 7, 45, 7, Black);
+
+		  ssd1306_SetCursor(100,11);
+		  ssd1306_WriteChar('3', Font_7x10, Black);
+
+		  ssd1306_UpdateScreen();
+
+		  mode_chosen = false;
+
+		  HAL_ADC_Start_IT(&hadc1);
+	}
+}
+
+static void resistance_1_measure(void)
+{
+	if (mode_chosen) {
+		  ssd1306_SetCursor(40,10);
+		  ssd1306_WriteChar('R', Font_7x10, Black);
+
+		  ssd1306_SetCursor(100,11);
+		  ssd1306_WriteChar('1', Font_7x10, Black);
+
+		  ssd1306_UpdateScreen();
+
+		  mode_chosen = false;
+
+		  HAL_ADC_Start_IT(&hadc1);
+	}
+}
+
+static void resistance_2_measure(void)
+{
+	if (mode_chosen) {
+		  ssd1306_SetCursor(40,10);
+		  ssd1306_WriteChar('R', Font_7x10, Black);
+
+		  ssd1306_SetCursor(100,11);
+		  ssd1306_WriteChar('2', Font_7x10, Black);
+
+		  ssd1306_UpdateScreen();
+
+		  mode_chosen = false;
+
+		  HAL_ADC_Start_IT(&hadc1);
+	}
+}
+
+static void resistance_3_measure(void)
+{
+	if (mode_chosen) {
+		  ssd1306_SetCursor(40,10);
+		  ssd1306_WriteChar('R', Font_7x10, Black);
+
+		  ssd1306_SetCursor(100,11);
+		  ssd1306_WriteChar('3', Font_7x10, Black);
+
+		  ssd1306_UpdateScreen();
+
+		  mode_chosen = false;
+
+		  HAL_ADC_Start_IT(&hadc1);
+	}
+}
+
+static void capacity_1_measure(void)
+{
+	if (mode_chosen) {
+		  ssd1306_SetCursor(40,10);
+		  ssd1306_WriteChar('C', Font_7x10, Black);
+
+		  ssd1306_SetCursor(100,11);
+		  ssd1306_WriteChar('1', Font_7x10, Black);
+
+		  ssd1306_UpdateScreen();
+
+		  mode_chosen = false;
+
+		  HAL_TIM_Base_Start_IT(&htim1);
+		  HAL_TIM_Base_Start(&htim2);
+	}
+}
+
+static void capacity_2_measure(void)
+{
+	if (mode_chosen) {
+		  ssd1306_SetCursor(40,10);
+		  ssd1306_WriteChar('C', Font_7x10, Black);
+
+		  ssd1306_SetCursor(100,11);
+		  ssd1306_WriteChar('2', Font_7x10, Black);
+
+		  ssd1306_UpdateScreen();
+
+		  mode_chosen = false;
+
+		  HAL_TIM_Base_Start_IT(&htim1);
+		  HAL_TIM_Base_Start(&htim2);
+	}
+}
+
+static void capacity_3_measure(void)
+{
+	if (mode_chosen) {
+		  ssd1306_SetCursor(40,10);
+		  ssd1306_WriteChar('C', Font_7x10, Black);
+
+		  ssd1306_SetCursor(100,11);
+		  ssd1306_WriteChar('3', Font_7x10, Black);
+
+		  ssd1306_UpdateScreen();
+
+		  mode_chosen = false;
+
+		  HAL_TIM_Base_Start_IT(&htim1);
+		  HAL_TIM_Base_Start(&htim2);
+	}
+}
 
 /* USER CODE END 0 */
 
@@ -137,60 +407,50 @@ int main(void)
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 
-  HAL_TIM_Base_Start_IT(&htim1);
-  HAL_TIM_Base_Start(&htim2);
-
-  ssd1306_Init();
-
-  ssd1306_Fill(White);
-
-  ssd1306_SetCursor(5,10);
-  ssd1306_WriteString("Mode:", Font_7x10, Black);
-
-  ssd1306_SetCursor(40,10);
-  ssd1306_WriteChar('U', Font_7x10, Black);
-
-  ssd1306_Line(40, 7, 45, 7, Black); // U -
-//  ssd1306_Line(40, 6, 40, 8, Black); // U~
-//  ssd1306_Line(41, 6, 42, 6, Black);
-//  ssd1306_Line(43, 7, 44, 7, Black);
-//  ssd1306_DrawPixel(44, 6, Black);
-//  ssd1306_DrawPixel(44, 5, Black);
-
-  ssd1306_SetCursor(50,10);
-  ssd1306_WriteChar('|', Font_7x10, Black);
-
-  ssd1306_SetCursor(60,10);
-  ssd1306_WriteString("Range:", Font_7x10, Black);
-
-  ssd1306_SetCursor(100,11);
-  ssd1306_WriteString("3.3V", Font_6x8, Black);
-
-  ssd1306_DrawRectangle(5, 30, 123, 60, Black);
-
-  ssd1306_UpdateScreen();
+  default_display_setup();
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-  float adc_val = 0;
-  char str[9] = {0};
-  HAL_ADC_Start_IT(&hadc1);
-
   while (1)
   {
-	  if (adc_ready) {
-		  adc_val = (float)((adc_buf * 3.3) / 4095);
-		  snprintf(str, sizeof(str), "%f", adc_val);
-		  ssd1306_SetCursor(10, 37);
-		  ssd1306_WriteString(str, Font_11x18, Black);
-		  ssd1306_UpdateScreen();
-		  adc_ready = false;
-		  HAL_Delay(100);
-		  HAL_ADC_Start_IT(&hadc1);
+	  switch(mode) {
+	  	  case AC_VOLTAGE_MODE:
+	  		  ac_voltage_measure();
+	  		  break;
+	  	  case DC_VOLTAGE_MODE_RANGE_1:
+	  		  dc_voltage_1_measure();
+	  		  break;
+	  	  case DC_VOLTAGE_MODE_RANGE_2:
+	  		  dc_voltage_2_measure();
+	  		  break;
+	  	  case DC_VOLTAGE_MODE_RANGE_3:
+	  		  dc_voltage_3_measure();
+	  		  break;
+	  	  case RESISTANCE_MODE_RANGE_1:
+	  		  resistance_1_measure();
+	  		  break;
+	  	  case RESISTANCE_MODE_RANGE_2:
+	  		  resistance_2_measure();
+	  		  break;
+	  	  case RESISTANCE_MODE_RANGE_3:
+	  		  resistance_3_measure();
+	  		  break;
+	  	  case CAPACITY_MODE_RANGE_1:
+	  		  capacity_1_measure();
+	  		  break;
+	  	  case CAPACITY_MODE_RANGE_2:
+	  		  capacity_2_measure();
+	  		  break;
+	  	  case CAPACITY_MODE_RANGE_3:
+	  		  capacity_3_measure();
+	  		  break;
+	  	  default:
+	  		  Error_Handler();
 	  }
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
