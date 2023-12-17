@@ -1,0 +1,118 @@
+<mxfile host="Electron" modified="2023-12-17T09:26:17.306Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.2 Chrome/114.0.5735.289 Electron/25.9.4 Safari/537.36" etag="a2Lxc6IW63xSFkNEJ1PM" version="22.1.2" type="device">
+  <diagram name="Страница — 1" id="FWkU8ROC4NuM5ub_4fxK">
+    <mxGraphModel dx="1235" dy="629" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="iatx1fC06AlJGC94aqog-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="iatx1fC06AlJGC94aqog-1" target="iatx1fC06AlJGC94aqog-16" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="iatx1fC06AlJGC94aqog-1" value="Постоянное напряжение" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="200" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="iatx1fC06AlJGC94aqog-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="iatx1fC06AlJGC94aqog-2" target="iatx1fC06AlJGC94aqog-13" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="iatx1fC06AlJGC94aqog-2" value="Емкость" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="200" y="260" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Ju7FODOWVk-vW56EzP0G-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="iatx1fC06AlJGC94aqog-3" target="Ju7FODOWVk-vW56EzP0G-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="iatx1fC06AlJGC94aqog-3" value="Сопротивление" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="200" y="360" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="iatx1fC06AlJGC94aqog-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="iatx1fC06AlJGC94aqog-8" target="iatx1fC06AlJGC94aqog-1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="iatx1fC06AlJGC94aqog-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="iatx1fC06AlJGC94aqog-8" target="iatx1fC06AlJGC94aqog-2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="iatx1fC06AlJGC94aqog-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="iatx1fC06AlJGC94aqog-8" target="iatx1fC06AlJGC94aqog-3" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ju7FODOWVk-vW56EzP0G-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="iatx1fC06AlJGC94aqog-8" target="Ju7FODOWVk-vW56EzP0G-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="iatx1fC06AlJGC94aqog-8" value="Выбор режимов галетным переключателем" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="20" y="260" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Ju7FODOWVk-vW56EzP0G-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="iatx1fC06AlJGC94aqog-13" target="Ju7FODOWVk-vW56EzP0G-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="iatx1fC06AlJGC94aqog-13" value="Пока что один диапазон" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="400" y="260" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Ju7FODOWVk-vW56EzP0G-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="iatx1fC06AlJGC94aqog-15" target="Ju7FODOWVk-vW56EzP0G-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="iatx1fC06AlJGC94aqog-15" value="Макс 1 кГц частота, измеряемый размах - не определено" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="400" y="70" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Ju7FODOWVk-vW56EzP0G-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="iatx1fC06AlJGC94aqog-16" target="Ju7FODOWVk-vW56EzP0G-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="iatx1fC06AlJGC94aqog-16" value="3 диапазона" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="400" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="iatx1fC06AlJGC94aqog-35" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="iatx1fC06AlJGC94aqog-23" target="iatx1fC06AlJGC94aqog-33" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="iatx1fC06AlJGC94aqog-23" value="Дисплей" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="827" y="260" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="iatx1fC06AlJGC94aqog-29" value="Режим&lt;br&gt;Диапазон&lt;br&gt;Значение" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="857" y="210" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="iatx1fC06AlJGC94aqog-33" value="2 раза в секунду вывод (пока условно)" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="1037" y="260" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Ju7FODOWVk-vW56EzP0G-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="Ju7FODOWVk-vW56EzP0G-1" target="iatx1fC06AlJGC94aqog-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ju7FODOWVk-vW56EzP0G-1" value="Переменное напряжение" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="70" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Ju7FODOWVk-vW56EzP0G-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="Ju7FODOWVk-vW56EzP0G-2" target="Ju7FODOWVk-vW56EzP0G-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ju7FODOWVk-vW56EzP0G-2" value="3 диапазона" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="360" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Ju7FODOWVk-vW56EzP0G-6" value="Режим" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="230" y="30" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Ju7FODOWVk-vW56EzP0G-7" value="Диапазон" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="430" y="30" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Ju7FODOWVk-vW56EzP0G-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="Ju7FODOWVk-vW56EzP0G-8" target="iatx1fC06AlJGC94aqog-23">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ju7FODOWVk-vW56EzP0G-8" value="Не определено наверняка" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="70" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Ju7FODOWVk-vW56EzP0G-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="Ju7FODOWVk-vW56EzP0G-9" target="iatx1fC06AlJGC94aqog-23">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ju7FODOWVk-vW56EzP0G-9" value="Значение с АЦП, умноженное на заданный коэффициент" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Ju7FODOWVk-vW56EzP0G-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="Ju7FODOWVk-vW56EzP0G-10" target="iatx1fC06AlJGC94aqog-23">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ju7FODOWVk-vW56EzP0G-10" value="Измерение частоты автогенератора" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="260" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Ju7FODOWVk-vW56EzP0G-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="Ju7FODOWVk-vW56EzP0G-11" target="iatx1fC06AlJGC94aqog-23">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ju7FODOWVk-vW56EzP0G-11" value="Пересчет полученного значения с АЦП" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="360" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Ju7FODOWVk-vW56EzP0G-12" value="Метод измерения" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="630" y="30" width="60" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
