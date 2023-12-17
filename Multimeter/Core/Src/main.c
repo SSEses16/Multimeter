@@ -20,6 +20,7 @@
 #include "main.h"
 #include "adc.h"
 #include "i2c.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -28,6 +29,7 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "ssd1306.h"
 
@@ -75,6 +77,24 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	}
 }
 
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	if(htim == &htim1)
+    {
+        uint32_t freq = TIM2->CNT;
+
+        char str[50] = {0};
+
+        snprintf(str, sizeof(str), "FREQUENCY: %lu Hz\n--------------------\n", freq * 2);
+        HAL_UART_Transmit(&huart2, (uint8_t*)str, strlen(str), 1000);
+
+        HAL_TIM_Base_Stop_IT(&htim1);
+
+        __HAL_TIM_SET_COUNTER(&htim2, 0);
+        HAL_TIM_Base_Start_IT(&htim1);
+    }
+}
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -113,7 +133,12 @@ int main(void)
   MX_ADC1_Init();
   MX_I2C1_Init();
   MX_USART2_UART_Init();
+  MX_TIM1_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+
+  HAL_TIM_Base_Start_IT(&htim1);
+  HAL_TIM_Base_Start(&htim2);
 
   ssd1306_Init();
 
