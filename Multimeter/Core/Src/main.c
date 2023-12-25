@@ -21,7 +21,6 @@
 #include "adc.h"
 #include "i2c.h"
 #include "tim.h"
-#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -42,7 +41,22 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+/*Общий поправочный коэффициент (например, если нужно пересчитать 3,3 в 2 и т.п.)
+ * если не нужен, то пусть останется 1
+ * */
+#define K		1
 
+#define Kc		1
+
+#define Kr1		1
+#define Kr2		1
+#define Kr3		1
+
+#define Ku1		1
+#define Ku2		1
+#define Ku3		1
+
+#define Ku_a	1
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -67,18 +81,29 @@ enum modes {
 	CAPACITY_MODE_RANGE_3,
 };
 
-static char str[9] 			 = {0};
+enum adc_channels {
+	VOLTAGE_CHANNEL = 1,
+	RESISTANCE_CHANNEL
+};
 
-static uint32_t adc_buf[100] = {0};
-static uint32_t freq 		 = 0;
-static uint8_t  i 			 = 0;
-static uint8_t  mode 		 = 0;
+static char str[9] 		       = {0};
+
+static uint32_t adc_V_buf[100] = {0};
+static uint32_t adc_R_buf[100] = {0};
+static uint32_t freq 		   = 0;
+static uint8_t  i 			   = 0;
+static uint8_t  q 			   = 0;
+static uint8_t  mode 		   = 0;
+static uint8_t 	channel		   = VOLTAGE_CHANNEL;
 
 static bool mode_chosen = false;
 static bool adc_ready 	= false;
 static bool tim_ready 	= false;
 
-static float measure_coefficient = 0.0;
+static float Capacity   = 0;
+static float Resistance = 0;
+static float Voltage    = 0;
+static float Voltage_AC = 0;
 
 /* USER CODE END PV */
 
@@ -128,27 +153,34 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
 	if (hadc == &hadc1) {
-		if (i != 100) {
-			adc_buf[i] = HAL_ADC_GetValue(hadc);
-			i++;
-			HAL_ADC_Start_IT(&hadc1);
+		if (channel == VOLTAGE_CHANNEL) {
+			if (i != 100) {
+				adc_V_buf[i] = HAL_ADC_GetValue(hadc);
+				i++;
+				HAL_ADC_Start_IT(&hadc1);
+			}
+			channel++;
 		}
-		else {
+		else if (channel == RESISTANCE_CHANNEL){
+			if (q != 100) {
+				adc_R_buf[q] = HAL_ADC_GetValue(hadc);
+				q++;
+				HAL_ADC_Start_IT(&hadc1);
+			}
+			channel--;
+		}
+
+		if ((q == 100) && (i == 100)) {
 			adc_ready = true;
+			q = 0;
 			i = 0;
 		}
+
 	}
 	else {
 		Error_Handler();
 	}
 }
-
-//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-//{
-//	if (huart != &huart2) {
-//		Error_Handler();
-//	}
-//}
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
@@ -165,15 +197,39 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	}
 }
 
-static float voltage_average(void)
+static float voltage_channel_average(void)
 {
 	uint64_t voltage_tmp = 0;
 
 	for (uint8_t j = 0; j < 100; j++) {
-		voltage_tmp += adc_buf[j];
+		voltage_tmp += adc_V_buf[j];
 	}
 
 	return (float)((voltage_tmp * 3.3) / (100 * 4095));
+}
+
+static float resistance_channel_average(void)
+{
+	uint64_t voltage_tmp = 0;
+
+	for (uint8_t j = 0; j < 100; j++) {
+		voltage_tmp += adc_R_buf[j];
+	}
+
+	return (float)((voltage_tmp * 3.3) / (100 * 4095));
+}
+
+static uint32_t voltage_max(void)
+{
+	uint32_t voltage_tmp = 0;
+
+	for (uint8_t j = 0; j < 100; j++) {
+		if (adc_V_buf[j] > voltage_tmp) {
+			voltage_tmp = adc_V_buf[j];
+		}
+	}
+
+	return voltage_tmp;
 }
 
 /* USER CODE END PFP */
@@ -201,6 +257,7 @@ static void default_display_setup(void)
 	  ssd1306_UpdateScreen();
 }
 
+/* �?змерение переменного напряжения */
 static void ac_voltage_measure(void)
 {
 	if (mode_chosen) {
@@ -217,12 +274,23 @@ static void ac_voltage_measure(void)
 
 		  mode_chosen = false;
 
-		  measure_coefficient = 1.0;
-
 		  HAL_ADC_Start_IT(&hadc1);
+	}
+	if (adc_ready) {
+		Voltage_AC = (float)(voltage_max() * Ku_a * K / 1.4142);
+		snprintf(str, sizeof(str), "%f", Voltage_AC);
+
+		ssd1306_SetCursor(10, 37);
+		ssd1306_WriteString(str, Font_11x18, Black);
+		ssd1306_UpdateScreen();
+
+		adc_ready = false;
+
+		HAL_ADC_Start_IT(&hadc1);
 	}
 }
 
+/* Измерение постоянного напряжения. Первый диапазон */
 static void dc_voltage_1_measure(void)
 {
 	if (mode_chosen) {
@@ -238,14 +306,13 @@ static void dc_voltage_1_measure(void)
 
 		  mode_chosen = false;
 
-		  measure_coefficient = 1.0;
-
 		  HAL_ADC_Start_IT(&hadc1);
 	}
 
 	if (adc_ready) {
-	  float voltage = (voltage_average() * measure_coefficient);
-	  snprintf(str, sizeof(str), "%f", voltage);
+	  float voltage = voltage_channel_average();
+	  Voltage = voltage * Ku1 * K;
+	  snprintf(str, sizeof(str), "%f", Voltage);
 
 	  ssd1306_SetCursor(10, 37);
 	  ssd1306_WriteString(str, Font_11x18, Black);
@@ -257,6 +324,7 @@ static void dc_voltage_1_measure(void)
 	}
 }
 
+/* �?змерение постоянного напряжения. Второй диапазон */
 static void dc_voltage_2_measure(void)
 {
 	if (mode_chosen) {
@@ -272,14 +340,13 @@ static void dc_voltage_2_measure(void)
 
 		  mode_chosen = false;
 
-		  measure_coefficient = 1.0;
-
 		  HAL_ADC_Start_IT(&hadc1);
 	}
 
 	if (adc_ready) {
-	  float voltage = (voltage_average() * measure_coefficient);
-	  snprintf(str, sizeof(str), "%f", voltage);
+	  float voltage = voltage_channel_average();
+	  Voltage = voltage * Ku2 * K;
+	  snprintf(str, sizeof(str), "%f", Voltage);
 
 	  ssd1306_SetCursor(10, 37);
 	  ssd1306_WriteString(str, Font_11x18, Black);
@@ -291,6 +358,7 @@ static void dc_voltage_2_measure(void)
 	}
 }
 
+/* �?змерение постоянного напряжения. Третий диапазон */
 static void dc_voltage_3_measure(void)
 {
 	if (mode_chosen) {
@@ -306,14 +374,13 @@ static void dc_voltage_3_measure(void)
 
 		  mode_chosen = false;
 
-		  measure_coefficient = 1.0;
-
 		  HAL_ADC_Start_IT(&hadc1);
 	}
 
 	if (adc_ready) {
-	  float voltage = (voltage_average() * measure_coefficient);
-	  snprintf(str, sizeof(str), "%f", voltage);
+	  float voltage = voltage_channel_average();
+	  Voltage = voltage * Ku3 * K;
+	  snprintf(str, sizeof(str), "%f", Voltage);
 
 	  ssd1306_SetCursor(10, 37);
 	  ssd1306_WriteString(str, Font_11x18, Black);
@@ -325,6 +392,7 @@ static void dc_voltage_3_measure(void)
 	}
 }
 
+/* �?змерение сопротивления. Первый диапазон */
 static void resistance_1_measure(void)
 {
 	if (mode_chosen) {
@@ -338,14 +406,13 @@ static void resistance_1_measure(void)
 
 		  mode_chosen = false;
 
-		  measure_coefficient = 1.0;
-
 		  HAL_ADC_Start_IT(&hadc1);
 	}
 
 	if (adc_ready) {
-	  float voltage = (voltage_average() * measure_coefficient);
-	  snprintf(str, sizeof(str), "%f", voltage);
+	  float voltage = resistance_channel_average();
+	  Resistance = voltage * Kr1 * K;
+	  snprintf(str, sizeof(str), "%f", Resistance);
 
 	  ssd1306_SetCursor(10, 37);
 	  ssd1306_WriteString(str, Font_11x18, Black);
@@ -357,6 +424,7 @@ static void resistance_1_measure(void)
 	}
 }
 
+/* �?змерение сопротивления. Второй диапазон */
 static void resistance_2_measure(void)
 {
 	if (mode_chosen) {
@@ -370,14 +438,13 @@ static void resistance_2_measure(void)
 
 		  mode_chosen = false;
 
-		  measure_coefficient = 1.0;
-
 		  HAL_ADC_Start_IT(&hadc1);
 	}
 
 	if (adc_ready) {
-	  float voltage = (voltage_average() * measure_coefficient);
-	  snprintf(str, sizeof(str), "%f", voltage);
+	  float voltage = resistance_channel_average();
+	  Resistance = voltage * Kr2 * K;
+	  snprintf(str, sizeof(str), "%f", Resistance);
 
 	  ssd1306_SetCursor(10, 37);
 	  ssd1306_WriteString(str, Font_11x18, Black);
@@ -389,6 +456,7 @@ static void resistance_2_measure(void)
 	}
 }
 
+/* �?змерение сопротивления. Третий диапазон */
 static void resistance_3_measure(void)
 {
 	if (mode_chosen) {
@@ -402,14 +470,13 @@ static void resistance_3_measure(void)
 
 		  mode_chosen = false;
 
-		  measure_coefficient = 1.0;
-
 		  HAL_ADC_Start_IT(&hadc1);
 	}
 
 	if (adc_ready) {
-	  float voltage = (voltage_average() * measure_coefficient);
-	  snprintf(str, sizeof(str), "%f", voltage);
+	  float voltage = resistance_channel_average();
+	  Resistance = voltage * Kr3 * K;
+	  snprintf(str, sizeof(str), "%f", Resistance);
 
 	  ssd1306_SetCursor(10, 37);
 	  ssd1306_WriteString(str, Font_11x18, Black);
@@ -421,6 +488,10 @@ static void resistance_3_measure(void)
 	}
 }
 
+/* �?змерение емкости. Первый диапазон. P.S. Не уверен, нужны ли другие режимы
+ * для измерения емкости, потому что частота измеряется в довольно широком диапазоне.
+ * Пока оставил один функциональный режим.
+ *  */
 static void capacity_1_measure(void)
 {
 	if (mode_chosen) {
@@ -434,8 +505,6 @@ static void capacity_1_measure(void)
 
 		  mode_chosen = false;
 
-		  measure_coefficient = 1.0;
-
 		  HAL_TIM_Base_Start_IT(&htim1);
 		  HAL_TIM_Base_Start(&htim2);
 	}
@@ -443,10 +512,17 @@ static void capacity_1_measure(void)
 	if (tim_ready) {
         tim_ready = false;
 
-        char str[50] = {0};
+        /*
+         * Чтобы получить измеренную частоту, необходимо брать именно freq*2.
+         * В таком случае получается частота в Гц.
+         * */
 
-        snprintf(str, sizeof(str), "FREQUENCY: %lu Hz\n--------------------\n", freq * 2);
-        HAL_UART_Transmit(&huart2, (uint8_t*)str, strlen(str), 1000);
+        Capacity = (float)((freq * 2) * Kc);
+        snprintf(str, sizeof(str), "%f", Capacity);
+
+        ssd1306_SetCursor(10, 37);
+        ssd1306_WriteString(str, Font_11x18, Black);
+        ssd1306_UpdateScreen();
 
         __HAL_TIM_SET_COUNTER(&htim2, 0);
         HAL_TIM_Base_Start_IT(&htim1);
@@ -455,66 +531,66 @@ static void capacity_1_measure(void)
 
 static void capacity_2_measure(void)
 {
-	if (mode_chosen) {
-		  ssd1306_SetCursor(40,10);
-		  ssd1306_WriteChar('C', Font_7x10, Black);
-
-		  ssd1306_SetCursor(100,11);
-		  ssd1306_WriteChar('2', Font_7x10, Black);
-
-		  ssd1306_UpdateScreen();
-
-		  mode_chosen = false;
-
-		  measure_coefficient = 1.0;
-
-		  HAL_TIM_Base_Start_IT(&htim1);
-		  HAL_TIM_Base_Start(&htim2);
-	}
-
-	if (tim_ready) {
-        tim_ready = false;
-
-        char str[50] = {0};
-
-        snprintf(str, sizeof(str), "FREQUENCY: %lu Hz\n--------------------\n", freq * 2);
-        HAL_UART_Transmit(&huart2, (uint8_t*)str, strlen(str), 1000);
-
-        __HAL_TIM_SET_COUNTER(&htim2, 0);
-        HAL_TIM_Base_Start_IT(&htim1);
-	}
+//	if (mode_chosen) {
+//		  ssd1306_SetCursor(40,10);
+//		  ssd1306_WriteChar('C', Font_7x10, Black);
+//
+//		  ssd1306_SetCursor(100,11);
+//		  ssd1306_WriteChar('2', Font_7x10, Black);
+//
+//		  ssd1306_UpdateScreen();
+//
+//		  mode_chosen = false;
+//
+//		  measure_coefficient = 1.0;
+//
+//		  HAL_TIM_Base_Start_IT(&htim1);
+//		  HAL_TIM_Base_Start(&htim2);
+//	}
+//
+//	if (tim_ready) {
+//        tim_ready = false;
+//
+//        char str[50] = {0};
+//
+//        snprintf(str, sizeof(str), "FREQUENCY: %lu Hz\n--------------------\n", freq * 2);
+//        HAL_UART_Transmit(&huart2, (uint8_t*)str, strlen(str), 1000);
+//
+//        __HAL_TIM_SET_COUNTER(&htim2, 0);
+//        HAL_TIM_Base_Start_IT(&htim1);
+//	}
 }
 
 static void capacity_3_measure(void)
 {
-	if (mode_chosen) {
-		  ssd1306_SetCursor(40,10);
-		  ssd1306_WriteChar('C', Font_7x10, Black);
-
-		  ssd1306_SetCursor(100,11);
-		  ssd1306_WriteChar('3', Font_7x10, Black);
-
-		  ssd1306_UpdateScreen();
-
-		  mode_chosen = false;
-
-		  measure_coefficient = 1.0;
-
-		  HAL_TIM_Base_Start_IT(&htim1);
-		  HAL_TIM_Base_Start(&htim2);
-	}
-
-	if (tim_ready) {
-		tim_ready = false;
-
-        char str[50] = {0};
-
-        snprintf(str, sizeof(str), "FREQUENCY: %lu Hz\n--------------------\n", freq * 2);
-        HAL_UART_Transmit(&huart2, (uint8_t*)str, strlen(str), 1000);
-
-        __HAL_TIM_SET_COUNTER(&htim2, 0);
-        HAL_TIM_Base_Start_IT(&htim1);
-	}
+//	if (mode_chosen) {
+//		  ssd1306_SetCursor(40,10);
+//		  ssd1306_WriteChar('C', Font_7x10, Black);
+//
+//		  ssd1306_SetCursor(100,11);
+//		  ssd1306_WriteChar('3', Font_7x10, Black);
+//
+//		  ssd1306_UpdateScreen();
+//
+//		  mode_chosen = false;
+//
+//		  measure_coefficient = 1.0;
+//
+//		  HAL_TIM_Base_Start_IT(&htim1);
+//		  HAL_TIM_Base_Start(&htim2);
+//	}
+//
+//	if (tim_ready) {
+//		tim_ready = false;
+//
+//        char str[50] = {0};
+//
+//        snprintf(str, sizeof(str), "FREQUENCY: %lu Hz\n--------------------\n", freq * 2);
+//        HAL_UART_Transmit(&huart2, (uint8_t*)str, strlen(str), 1000);
+//
+//        __HAL_TIM_SET_COUNTER(&htim2, 0);
+//        HAL_TIM_Base_Start_IT(&htim1);
+//	}
 }
 
 /* USER CODE END 0 */
@@ -549,7 +625,6 @@ int main(void)
   MX_GPIO_Init();
   MX_ADC1_Init();
   MX_I2C1_Init();
-  MX_USART2_UART_Init();
   MX_TIM1_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
