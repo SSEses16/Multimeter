@@ -302,7 +302,7 @@ static void ac_voltage_measure(void)
 	}
 }
 
-/* Измерение постоянного напряжения. Первый диапазон */
+/* �?змерение постоянного напряжения. Первый диапазон */
 static void dc_voltage_1_measure(void)
 {
 	if (mode_chosen) {
@@ -539,11 +539,11 @@ static void capacity_1_measure(void)
         tim_ready = false;
 
         /*
-         * Чтобы получить измеренную частоту, необходимо брать именно freq*2.
-         * В таком случае получается частота в Гц.
+         *
+         * Получается частота в Гц.
          * */
 
-        Capacity = (float)((freq * 2) * Kc);
+        Capacity = (float)(freq * Kc);
         snprintf(str, sizeof(str), "%f", Capacity);
 
         ssd1306_SetCursor(10, 37);
