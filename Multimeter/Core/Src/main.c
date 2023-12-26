@@ -229,7 +229,7 @@ static float resistance_channel_average(void)
 	return (float)((voltage_tmp * 3.3) / (100 * 4095));
 }
 
-static uint32_t voltage_max(void)
+static float voltage_max(void)
 {
 	uint32_t voltage_tmp = 0;
 
@@ -239,7 +239,7 @@ static uint32_t voltage_max(void)
 		}
 	}
 
-	return voltage_tmp;
+	return (float)(voltage_tmp * 3.3 / 4095);
 }
 
 /* USER CODE END PFP */
