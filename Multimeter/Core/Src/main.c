@@ -93,10 +93,10 @@ static uint32_t adc_R_buf[100] = {0};
 static uint32_t freq 		   = 0;
 static uint8_t  i 			   = 0;
 static uint8_t  q 			   = 0;
-static uint8_t  mode 		   = 0;
+static uint8_t  mode 		   = DC_VOLTAGE_MODE_RANGE_1;
 static uint8_t 	channel		   = VOLTAGE_CHANNEL;
 
-static bool mode_chosen = false;
+static bool mode_chosen = true;
 static bool adc_ready 	= false;
 static bool tim_ready 	= false;
 
@@ -290,7 +290,7 @@ static void ac_voltage_measure(void)
 	}
 }
 
-/* Измерение постоянного напряжения. Первый диапазон */
+/* �?змерение постоянного напряжения. Первый диапазон */
 static void dc_voltage_1_measure(void)
 {
 	if (mode_chosen) {
