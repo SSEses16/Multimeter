@@ -100,6 +100,8 @@ static bool mode_chosen = true;
 static bool adc_ready 	= false;
 static bool tim_ready 	= false;
 
+static bool change = false;
+
 static float Capacity   = 0;
 static float Resistance = 0;
 static float Voltage    = 0;
@@ -174,6 +176,14 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 			adc_ready = true;
 			q = 0;
 			i = 0;
+			if (change) {
+				channel = VOLTAGE_CHANNEL;
+				change = false;
+			}
+			else {
+				channel = RESISTANCE_CHANNEL;
+				change = true;
+			}
 		}
 
 	}
@@ -261,6 +271,8 @@ static void default_display_setup(void)
 static void ac_voltage_measure(void)
 {
 	if (mode_chosen) {
+		  ssd1306_FillRectangle(40, 3, 48, 8, White);
+
 		  ssd1306_SetCursor(40,10);
 		  ssd1306_WriteChar('U', Font_7x10, Black);
 
@@ -290,10 +302,12 @@ static void ac_voltage_measure(void)
 	}
 }
 
-/* �?змерение постоянного напряжения. Первый диапазон */
+/* Измерение постоянного напряжения. Первый диапазон */
 static void dc_voltage_1_measure(void)
 {
 	if (mode_chosen) {
+		  ssd1306_FillRectangle(40, 3, 48, 8, White);
+
 		  ssd1306_SetCursor(40,10);
 		  ssd1306_WriteChar('U', Font_7x10, Black);
 
@@ -328,6 +342,8 @@ static void dc_voltage_1_measure(void)
 static void dc_voltage_2_measure(void)
 {
 	if (mode_chosen) {
+		  ssd1306_FillRectangle(40, 3, 48, 8, White);
+
 		  ssd1306_SetCursor(40,10);
 		  ssd1306_WriteChar('U', Font_7x10, Black);
 
@@ -362,6 +378,8 @@ static void dc_voltage_2_measure(void)
 static void dc_voltage_3_measure(void)
 {
 	if (mode_chosen) {
+		  ssd1306_FillRectangle(40, 3, 48, 8, White);
+
 		  ssd1306_SetCursor(40,10);
 		  ssd1306_WriteChar('U', Font_7x10, Black);
 
@@ -402,6 +420,8 @@ static void resistance_1_measure(void)
 		  ssd1306_SetCursor(100,11);
 		  ssd1306_WriteChar('1', Font_7x10, Black);
 
+		  ssd1306_FillRectangle(40, 3, 48, 8, White);
+
 		  ssd1306_UpdateScreen();
 
 		  mode_chosen = false;
@@ -434,6 +454,8 @@ static void resistance_2_measure(void)
 		  ssd1306_SetCursor(100,11);
 		  ssd1306_WriteChar('2', Font_7x10, Black);
 
+		  ssd1306_FillRectangle(40, 3, 48, 8, White);
+
 		  ssd1306_UpdateScreen();
 
 		  mode_chosen = false;
@@ -465,6 +487,8 @@ static void resistance_3_measure(void)
 
 		  ssd1306_SetCursor(100,11);
 		  ssd1306_WriteChar('3', Font_7x10, Black);
+
+		  ssd1306_FillRectangle(40, 3, 48, 8, White);
 
 		  ssd1306_UpdateScreen();
 
@@ -500,6 +524,8 @@ static void capacity_1_measure(void)
 
 		  ssd1306_SetCursor(100,11);
 		  ssd1306_WriteChar('1', Font_7x10, Black);
+
+		  ssd1306_FillRectangle(40, 3, 48, 8, White);
 
 		  ssd1306_UpdateScreen();
 
@@ -672,6 +698,7 @@ int main(void)
 	  	  default:
 	  		  Error_Handler();
 	  }
+	  HAL_Delay(200);
 
     /* USER CODE END WHILE */
 
